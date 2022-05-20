@@ -1,9 +1,21 @@
 const express = require("express");
 const dotenv = require("dotenv").config();
 const dbConnect = require("./config/db");
+const { errorHandler, notFound } = require("./middlewares/errorHandler");
 
-const app = express();
+// connecting to database
 dbConnect();
-const PORT = process.env.PORT || 5000;
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-app.listen(5555, console.log("Server is running on port 5555"));
+// user routes
+app.use("/api/users", require("./routes/userRoutes"));
+
+// not found handler
+app.use(notFound);
+// error handler
+app.use(errorHandler);
+// listen to port
+const PORT = process.env.PORT || 5555;
+app.listen(PORT, console.log(`Server is running on port ${PORT}`));
