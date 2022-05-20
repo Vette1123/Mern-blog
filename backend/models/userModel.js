@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // creating schema for user
 
@@ -109,6 +110,10 @@ const userSchema = new mongoose.Schema(
 
 // hashing password before saving
 userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    next();
+  }
+
   // hashing password
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
@@ -118,6 +123,16 @@ userSchema.pre("save", async function (next) {
 // checking if password is correct, exporting methods
 userSchema.methods.matchPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
+};
+
+// generating token for user
+userSchema.methods.generateToken = function () {
+  const token = jwt.sign(
+    { id: this._id, email: this.email },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRATION_DURATION }
+  );
+  return token;
 };
 
 const User = mongoose.model("User", userSchema);
