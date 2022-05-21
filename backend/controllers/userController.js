@@ -104,6 +104,76 @@ const updatePassword = asyncHandler(async (req, res, next) => {
   });
 });
 
+// follow user controller
+const userFollow = asyncHandler(async (req, res, next) => {
+  const { followId } = req.body;
+  const loginUserId = req.user.id;
+
+  //find the target user and check if the login id exist
+  const targetUser = await User.findById(followId);
+
+  const alreadyFollowing = targetUser?.followers?.find(
+    (user) => user?.toString() === loginUserId.toString()
+  );
+
+  if (alreadyFollowing) throw new Error("You have already followed this user");
+
+  //1. Find the user you want to follow and update it's followers field
+  await User.findByIdAndUpdate(
+    followId,
+    {
+      $push: { followers: loginUserId },
+      isFollowing: true,
+    },
+    { new: true }
+  );
+
+  //2. Update the login user following field
+  await User.findByIdAndUpdate(
+    loginUserId,
+    {
+      $push: { following: followId },
+    },
+    { new: true }
+  );
+  res.json("You have successfully followed this user");
+});
+
+// unfollow user controller
+const userUnfollow = asyncHandler(async (req, res, next) => {
+  const { unfollowId } = req.body;
+  const loginUserId = req.user.id;
+
+  //find the target user and check if the login id exist
+  const targetUser = await User.findById(unfollowId);
+
+  const alreadyFollowing = targetUser?.followers?.find(
+    (user) => user?.toString() === loginUserId.toString()
+  );
+
+  if (!alreadyFollowing) throw new Error("You have not followed this user");
+
+  //1. Find the user you want to follow and update it's followers field
+  await User.findByIdAndUpdate(
+    unfollowId,
+    {
+      $pull: { followers: loginUserId },
+      isFollowing: false,
+    },
+    { new: true }
+  );
+
+  //2. Update the login user following field
+  await User.findByIdAndUpdate(
+    loginUserId,
+    {
+      $pull: { following: unfollowId },
+    },
+    { new: true }
+  );
+  res.json("You have successfully unfollowed this user");
+});
+
 module.exports = {
   register,
   login,
@@ -112,4 +182,6 @@ module.exports = {
   deleteUser,
   updateUser,
   updatePassword,
+  userFollow,
+  userUnfollow,
 };
