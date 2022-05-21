@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 // creating schema for user
 
@@ -133,6 +134,32 @@ userSchema.methods.generateToken = function () {
     { expiresIn: process.env.JWT_EXPIRATION_DURATION }
   );
   return token;
+};
+// veryfying user account
+userSchema.methods.generateVerificationToken = function () {
+  // create a token
+  const verficationToken = crypto.randomBytes(32).toString("hex");
+  // hash the token and set it to the user's account verification token
+  this.accountVerificationToken = crypto
+    .createHash("sha256")
+    .update(verficationToken)
+    .digest("hex");
+  // set a expiration date for the token after 10 minutes
+  this.accountVerificationExpiry = Date.now() + 10 * 60 * 1000;
+  return verficationToken;
+};
+// forgot password
+userSchema.methods.generatePasswordResetToken = function () {
+  // create a token
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  // hash the token and set it to the user's password reset token
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  // set a expiration date for the token after 10 minutes
+  this.passwordResetExpiry = Date.now() + 10 * 60 * 1000;
+  return resetToken;
 };
 
 const User = mongoose.model("User", userSchema);

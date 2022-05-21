@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
-const { validateMongodbid } = require("./utils");
+const { validateMongodbId } = require("../utils/validateMongodbID");
+const crypto = require("crypto");
 
 // register user controller
 const register = asyncHandler(async (req, res, next) => {
@@ -173,6 +174,126 @@ const userUnfollow = asyncHandler(async (req, res, next) => {
   );
   res.json("You have successfully unfollowed this user");
 });
+// block a user
+const blockUser = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+
+  const user = await User.findByIdAndUpdate(
+    id,
+    {
+      isBlocked: true,
+    },
+    { new: true }
+  );
+  res.json(user);
+});
+// unblock a user
+const unblockUser = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+
+  const user = await User.findByIdAndUpdate(
+    id,
+    {
+      isBlocked: false,
+    },
+    { new: true }
+  );
+  res.json(user);
+});
+
+// account verification / send email
+const generateverificationToken = asyncHandler(async (req, res, next) => {
+  const loginUserId = req.user.id;
+  const user = await User.findById(loginUserId);
+  if (!user) {
+    return next(new Error("User not found", 404));
+  }
+  const token = user.generateVerificationToken();
+  await user.save({ validateBeforeSave: false });
+  const url = `${req.protocol}://${req.get(
+    "host"
+  )}/api/users/verify-email/${token}`;
+  const message = `Please verify your email by clicking the link: ${url}. If you did not request this, please ignore this email.`;
+  // await sendEmail({
+  //   email: user.email,
+  //   subject: "Email Verification",
+  //   message,
+  // });
+  res.status(200).json({
+    success: true,
+    message: message,
+  });
+});
+
+// account verification / verify email
+const verifyEmail = asyncHandler(async (req, res, next) => {
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+  const user = await User.findOne({
+    verificationToken: hashedToken,
+    verificationTokenExpires: { $gt: Date.now() },
+  });
+  if (!user) {
+    return next(new Error("Invalid token", 400));
+  }
+  user.isVerified = true;
+  user.accountVerificationToken = undefined;
+  user.accountVerificationExpiry = undefined;
+  await user.save({ validateBeforeSave: false });
+  res.status(200).json({
+    success: true,
+    message: "Your email has been verified",
+  });
+});
+// forgot password
+const forgotPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new Error("User not found", 404));
+  }
+  const token = user.generatePasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+  const url = `${req.protocol}://${req.get(
+    "host"
+  )}/api/users/reset-password/${token}`;
+  const message = `Please reset your password by clicking the link: ${url}. If you did not request this, please ignore this email.`;
+  // await sendEmail({
+  //   email: user.email,
+  //   subject: "Password Reset",
+  //   message,
+  // });
+  res.status(200).json({
+    success: true,
+    message: message,
+  });
+});
+// reset password
+const resetPassword = asyncHandler(async (req, res, next) => {
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetTokenExpires: { $gt: Date.now() },
+  });
+  if (!user) {
+    return next(new Error("Invalid token", 400));
+  }
+  user.password = req.body.password;
+  user.passwordResetToken = undefined;
+  user.passwordResetTokenExpires = undefined;
+  await user.save({ validateBeforeSave: false });
+  res.status(200).json({
+    success: true,
+    message: "Your password has been reset",
+  });
+});
 
 module.exports = {
   register,
@@ -184,4 +305,10 @@ module.exports = {
   updatePassword,
   userFollow,
   userUnfollow,
+  blockUser,
+  unblockUser,
+  generateverificationToken,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
 };
