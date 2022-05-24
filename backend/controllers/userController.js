@@ -213,16 +213,20 @@ const generateverificationToken = asyncHandler(async (req, res, next) => {
     return next(new Error("User not found", 404));
   }
   const token = user.generateVerificationToken();
+  console.log(token);
   await user.save({ validateBeforeSave: false });
   const url = `${req.protocol}://${req.get(
     "host"
   )}/api/users/verify-email/${token}`;
   const message = `Please verify your email by clicking the link: ${url}. If you did not request this, please ignore this email.`;
-  // await sendEmail({
-  //   email: user.email,
-  //   subject: "Email Verification",
-  //   message,
-  // });
+  const msg = {
+    to: "boogado@yahoo.com",
+    from: "sadge@post.com",
+    subject: "Account Verification",
+    text: message,
+    html: `<p>Please verify your email by clicking the link: <a href="${url}">${url}</a>. If you did not request this, please ignore this email.</p>`,
+  };
+  await sgMail.send(msg);
   res.status(200).json({
     success: true,
     message: message,
@@ -231,55 +235,61 @@ const generateverificationToken = asyncHandler(async (req, res, next) => {
 
 // account verification / verify email
 const verifyEmail = asyncHandler(async (req, res, next) => {
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(req.params.token)
-    .digest("hex");
+  const { token } = req.body;
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
   const user = await User.findOne({
-    verificationToken: hashedToken,
+    accountVerificationToken: hashedToken,
     verificationTokenExpires: { $gt: Date.now() },
   });
   if (!user) {
     return next(new Error("Invalid token", 400));
   }
-  user.isVerified = true;
+  user.isAccountVerified = true;
   user.accountVerificationToken = undefined;
   user.accountVerificationExpiry = undefined;
   await user.save({ validateBeforeSave: false });
   res.status(200).json({
     success: true,
     message: "Your email has been verified",
+    data: user,
   });
 });
 // forgot password
-const forgotPassword = asyncHandler(async (req, res, next) => {
+const forgotPasswordToken = asyncHandler(async (req, res, next) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
     return next(new Error("User not found", 404));
   }
-  const token = user.generatePasswordResetToken();
-  await user.save({ validateBeforeSave: false });
-  const url = `${req.protocol}://${req.get(
-    "host"
-  )}/api/users/reset-password/${token}`;
-  const message = `Please reset your password by clicking the link: ${url}. If you did not request this, please ignore this email.`;
-  // await sendEmail({
-  //   email: user.email,
-  //   subject: "Password Reset",
-  //   message,
-  // });
-  res.status(200).json({
-    success: true,
-    message: message,
-  });
+
+  try {
+    const token = user.generatePasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+    const url = `${req.protocol}://${req.get(
+      "host"
+    )}/api/users/reset-password/${token}`;
+    const message = `You are receiving this email because you (or someone else) have requested the reset of a password. Please make a PUT request to: ${url}`;
+    const msg = {
+      to: email,
+      from: "sadge@post.com",
+      subject: "Password reset",
+      text: message,
+      html: `<p>You are receiving this email because you (or someone else) have requested the reset of a password. Please make a PUT request to: <a href="${url}">${url}</a></p>`,
+    };
+    await sgMail.send(msg);
+    res.status(200).json({
+      success: true,
+      message: "Email sent",
+      data: msg,
+    });
+  } catch (error) {
+    return next(new Error("Something went wrong", 500));
+  }
 });
 // reset password
 const resetPassword = asyncHandler(async (req, res, next) => {
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(req.params.token)
-    .digest("hex");
+  const { token, password } = req.body;
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
   const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetTokenExpires: { $gt: Date.now() },
@@ -287,14 +297,53 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new Error("Invalid token", 400));
   }
-  user.password = req.body.password;
+  user.password = password;
   user.passwordResetToken = undefined;
-  user.passwordResetTokenExpires = undefined;
+  user.passwordResetExpiry = undefined;
   await user.save({ validateBeforeSave: false });
   res.status(200).json({
     success: true,
     message: "Your password has been reset",
   });
+});
+// profile picture upload
+const profilePictureUpload = asyncHandler(async (req, res, next) => {
+  console.log(req.file);
+
+  // const { id } = req.params;
+  // validateMongodbId(id);
+  // const user = await User.findById(id);
+  // if (!user) {
+  //   return next(new Error("User not found", 404));
+  // }
+  // if (!req.files) {
+  //   return next(new Error("Please upload a file", 400));
+  // }
+  // const file = req.files.file;
+  // if (!file.mimetype.startsWith("image")) {
+  //   return next(new Error("Please upload an image", 400));
+  // }
+  // if (file.size > process.env.MAX_FILE_UPLOAD) {
+  //   return next(
+  //     new Error(
+  //       `Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`,
+  //       400
+  //     )
+  //   );
+  // }
+  // file.name = `photo_${user.id}${path.parse(file.name).ext}`;
+  // file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+  //   if (err) {
+  //     return next(new Error("Something went wrong", 500));
+  //   }
+  //   user.photo = file.name;
+  //   await user.save({ validateBeforeSave: false });
+  //   res.status(200).json({
+  //     success: true,
+  //     message: "File uploaded",
+  //     data: user,
+  //   });
+  // });
 });
 
 module.exports = {
@@ -311,6 +360,7 @@ module.exports = {
   unblockUser,
   generateverificationToken,
   verifyEmail,
-  forgotPassword,
+  forgotPasswordToken,
   resetPassword,
+  profilePictureUpload,
 };
