@@ -1,7 +1,5 @@
+const path = require("path");
 const multer = require("multer");
-
-// storage
-const multerStorage = multer.memoryStorage();
 
 // file type checking
 const multerFilter = (req, file, cb) => {
@@ -12,7 +10,9 @@ const multerFilter = (req, file, cb) => {
   }
 };
 const profilePictureUploadMulter = multer({
-  storage: multerStorage,
+  // dest : backend/uploads
+
+  dest: "backend/uploads/",
   fileFilter: multerFilter,
   limits: {
     fileSize: 1024 * 1024 * 5,

@@ -3,6 +3,11 @@ const asyncHandler = require("express-async-handler");
 const { validateMongodbId } = require("../utils/validateMongodbID");
 const crypto = require("crypto");
 const sgMail = require("@sendgrid/mail");
+const { uploadFile, getFileStream } = require("../utils/s3");
+const fs = require("fs");
+const util = require("util");
+const unlinkFile = util.promisify(fs.unlink);
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // register user controller
@@ -306,44 +311,40 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     message: "Your password has been reset",
   });
 });
-// profile picture upload
+// upload photos to s3
 const profilePictureUpload = asyncHandler(async (req, res, next) => {
-  console.log(req.file);
+  const { id } = req.user;
+  // console.log(user);
+  const file = req.file;
+  const result = await uploadFile(file);
+  console.log(result);
+  const user = await User.findByIdAndUpdate(
+    id,
+    {
+      profilePhoto: result?.Key,
+    },
+    { new: true }
+  );
+  console.log(user);
 
-  // const { id } = req.params;
-  // validateMongodbId(id);
-  // const user = await User.findById(id);
-  // if (!user) {
-  //   return next(new Error("User not found", 404));
-  // }
-  // if (!req.files) {
-  //   return next(new Error("Please upload a file", 400));
-  // }
-  // const file = req.files.file;
-  // if (!file.mimetype.startsWith("image")) {
-  //   return next(new Error("Please upload an image", 400));
-  // }
-  // if (file.size > process.env.MAX_FILE_UPLOAD) {
-  //   return next(
-  //     new Error(
-  //       `Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`,
-  //       400
-  //     )
-  //   );
-  // }
-  // file.name = `photo_${user.id}${path.parse(file.name).ext}`;
-  // file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
-  //   if (err) {
-  //     return next(new Error("Something went wrong", 500));
-  //   }
-  //   user.photo = file.name;
-  //   await user.save({ validateBeforeSave: false });
-  //   res.status(200).json({
-  //     success: true,
-  //     message: "File uploaded",
-  //     data: user,
-  //   });
-  // });
+  await unlinkFile(file.path);
+  res.status(200).json({
+    success: true,
+    message: "Profile picture uploaded",
+    data: user,
+  });
+});
+
+// download photo from aws s3
+const downloadProfilePicture = asyncHandler(async (req, res, next) => {
+  const { id } = req.user;
+  const user = await User.findById(id);
+  if (!user) {
+    return next(new Error("User not found", 404));
+  }
+  const readStream = getFileStream(user.profilePhoto);
+  console.log(readStream);
+  readStream.pipe(res);
 });
 
 module.exports = {
@@ -363,4 +364,5 @@ module.exports = {
   forgotPasswordToken,
   resetPassword,
   profilePictureUpload,
+  downloadProfilePicture,
 };

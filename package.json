@@ -14,7 +14,9 @@
   "license": "ISC",
   "dependencies": {
     "@sendgrid/mail": "^7.7.0",
+    "aws-sdk": "^2.1141.0",
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.30.0",
     "colors": "^1.4.0",
     "concurrently": "^7.2.0",
     "dotenv": "^16.0.1",

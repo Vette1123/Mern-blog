@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 const { profilePictureUploadMulter } = require("../middlewares/uploadPhotos");
-
 const {
   register,
   login,
@@ -20,25 +19,30 @@ const {
   resetPassword,
   verifyEmail,
   profilePictureUpload,
+  downloadProfilePicture,
 } = require("../controllers/userController");
 
 router
   .post("/register", register)
   .post("/login", login)
   .post("/send-email", authMiddleware, generateverificationToken)
-  .post("/forgot-password", authMiddleware, forgotPasswordToken);
-
-router.get("/", authMiddleware, getUsers).get("/:id", authMiddleware, getUser);
-router.delete("/:id", authMiddleware, deleteUser);
-
-router
-  .put("/follow", authMiddleware, userFollow)
-  .put(
+  .post(
     "/profile-picture",
     authMiddleware,
     profilePictureUploadMulter,
     profilePictureUpload
   )
+  .post("/forgot-password", authMiddleware, forgotPasswordToken);
+
+router
+  .get("/get-profile-picture", authMiddleware, downloadProfilePicture)
+  .get("/", authMiddleware, getUsers)
+  .get("/:id", authMiddleware, getUser);
+
+router.delete("/:id", authMiddleware, deleteUser);
+
+router
+  .put("/follow", authMiddleware, userFollow)
   .put("/unfollow", authMiddleware, userUnfollow)
   .put("/verify-email", authMiddleware, verifyEmail)
   .put("/reset-password", authMiddleware, resetPassword)
