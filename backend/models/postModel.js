@@ -47,8 +47,7 @@ const postSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      default:
-        "https://cdn.pixabay.com/photo/2020/10/25/09/23/seagull-5683637_960_720.jpg",
+      default: "",
     },
   },
   {

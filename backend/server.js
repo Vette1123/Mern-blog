@@ -11,6 +11,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // user routes
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/posts", require("./routes/postRoutes"));
 
 // not found handler
 app.use(notFound);

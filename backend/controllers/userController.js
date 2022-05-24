@@ -51,7 +51,7 @@ const login = asyncHandler(async (req, res, next) => {
 });
 
 const getUsers = asyncHandler(async (req, res, next) => {
-  const users = await User.find();
+  const users = await User.find().populate("posts");
   res.status(200).json({
     success: true,
     data: users,
