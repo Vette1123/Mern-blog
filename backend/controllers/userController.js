@@ -37,16 +37,17 @@ const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
-    return next(new Error("User not found", 404));
+    return next(new Error("User not found", 400));
   }
   const isMatch = await user.matchPassword(password);
   if (!isMatch) {
-    return next(new Error("Invalid password", 401));
+    return next(new Error("Invalid password", 400));
   }
   const token = user.generateToken();
   res.status(200).json({
     success: true,
     token,
+    data: user,
   });
 });
 

@@ -2,12 +2,16 @@ const express = require("express");
 const dotenv = require("dotenv").config();
 const dbConnect = require("./config/db");
 const { errorHandler, notFound } = require("./middlewares/errorHandler");
+const cors = require("cors");
 
 // connecting to database
 dbConnect();
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+// using cors to allow cross origin resource sharing
+// to allow requests from other origins
+app.use(cors());
 
 // user routes
 app.use("/api/users", require("./routes/userRoutes"));
