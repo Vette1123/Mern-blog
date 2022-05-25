@@ -14,11 +14,8 @@ import {
 const Auth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, user, isLoading, appErr, isRegister } = useSelector(
-    (state) => state?.auth
-  );
-
-  console.log("isAuthenticated", isAuthenticated, appErr);
+  const { isAuthenticated, user, isLoading, serverErr, appErr, isRegister } =
+    useSelector((state) => state?.auth);
 
   const validate = (values) => {
     const errors = {};
@@ -70,9 +67,6 @@ const Auth = () => {
 
     return errors;
   };
-  if (appErr) {
-    toast.error(appErr);
-  }
   if (isAuthenticated) {
     if (isRegister) {
       toast.success("Registration successful");
@@ -94,10 +88,16 @@ const Auth = () => {
     onSubmit: (values) => {
       if (isRegister) {
         dispatch(registerAuthAction(values));
+        if (appErr) {
+          toast.error(appErr);
+        }
         dispatch(reset());
         formik.resetForm();
       } else {
         dispatch(loginAuthAction(values));
+        if (appErr) {
+          toast.error(appErr);
+        }
         dispatch(reset());
         formik.resetForm();
       }
@@ -108,7 +108,7 @@ const Auth = () => {
   }
 
   return (
-    <section className="relative py-20 2xl:py-40 bg-gray-800 overflow-hidden">
+    <section className="relative min-h-screen py-20 2xl:py-40 bg-gray-800 overflow-hidden">
       <div className="relative container px-4 mx-auto">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-wrap items-center -mx-4">
@@ -130,6 +130,11 @@ const Auth = () => {
                   <h3 className="mb-10 text-2xl text-white font-bold font-heading">
                     {isRegister ? "Register Account" : "Login to your Account"}
                   </h3>
+                  {serverErr || appErr ? (
+                    <h2 className="text-red-500 my-4">
+                      {serverErr} - {appErr}
+                    </h2>
+                  ) : null}
                   {/* First name */}
                   {isRegister && (
                     <div className="flex items-center pl-6 mb-3 bg-white rounded-full">
@@ -397,6 +402,7 @@ const Auth = () => {
                     <button
                       onClick={() => {
                         dispatch(toggleRegister());
+                        dispatch(reset());
                       }}
                       type="button"
                       className="text-cyan-400	"

@@ -33,6 +33,10 @@ export const loginAuthAction = createAsyncThunk(
       const response = await axios.post(`${baseURL}users/login`, data);
       return response?.data;
     } catch (error) {
+      if (!error.response) {
+        throw error;
+      }
+
       return thunkAPI.rejectWithValue(error?.response.data);
     }
   }
@@ -45,10 +49,9 @@ const authSlice = createSlice({
     reset: (state) => {
       state.isLoading = "";
       state.isAuthenticated = "";
-      state.user = "";
-      state.appErr = "";
+      // state.user = "";
+      // state.appErr = "";
       state.serverErr = "";
-      state.isRegister = "";
     },
     toggleRegister: (state) => {
       state.isRegister = !state.isRegister;
