@@ -1,21 +1,32 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import baseURL from "../../utils/baseURL";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
+
+const token = cookies.get("token");
+const user = localStorage.getItem("userInfo")
+  ? JSON.parse(localStorage.getItem("userInfo"))
+  : null;
 
 const initialState = {
-  isAuthenticated: false,
-  user: undefined,
+  isAuthenticated: !!token,
+  user: user,
   isLoading: false,
   isRegister: false,
   appErr: undefined,
   serverErr: undefined,
 };
 
+// register user
 export const registerAuthAction = createAsyncThunk(
   "auth/registerUser",
   async (data, thunkAPI) => {
     try {
       const response = await axios.post(`${baseURL}users/register`, data);
+      cookies.set("token", response?.data.token, { path: "/" });
+      localStorage.setItem("userInfo", JSON.stringify(response?.data.data));
       return response?.data;
     } catch (error) {
       if (!error.response) {
@@ -26,17 +37,37 @@ export const registerAuthAction = createAsyncThunk(
   }
 );
 
+// login user
 export const loginAuthAction = createAsyncThunk(
   "auth/loginUser",
   async (data, thunkAPI) => {
     try {
       const response = await axios.post(`${baseURL}users/login`, data);
+      cookies.set("token", response?.data.token, { path: "/" });
+      localStorage.setItem("userInfo", JSON.stringify(response?.data.data));
       return response?.data;
     } catch (error) {
       if (!error.response) {
         throw error;
       }
 
+      return thunkAPI.rejectWithValue(error?.response.data);
+    }
+  }
+);
+
+// logout action
+
+export const logoutAuthAction = createAsyncThunk(
+  "auth/logoutUser",
+  async (data, thunkAPI) => {
+    try {
+      cookies.remove("token", { path: "/" });
+      localStorage.removeItem("userInfo");
+    } catch (error) {
+      if (!error.response) {
+        throw error;
+      }
       return thunkAPI.rejectWithValue(error?.response.data);
     }
   }
@@ -49,8 +80,8 @@ const authSlice = createSlice({
     reset: (state) => {
       state.isLoading = "";
       state.isAuthenticated = "";
-      // state.user = "";
-      // state.appErr = "";
+      state.user = "";
+      state.appErr = "";
       state.serverErr = "";
     },
     toggleRegister: (state) => {
@@ -66,10 +97,10 @@ const authSlice = createSlice({
     });
     builder.addCase(registerAuthAction.fulfilled, (state, action) => {
       state.isLoading = false;
-      state.isAuthenticated = true;
       state.appErr = undefined;
       state.serverErr = undefined;
-      state.user = action.payload;
+      state.user = action.payload.data;
+      state.isAuthenticated = action.payload.token;
     });
     builder.addCase(registerAuthAction.rejected, (state, action) => {
       state.isLoading = false;
@@ -85,12 +116,30 @@ const authSlice = createSlice({
     });
     builder.addCase(loginAuthAction.fulfilled, (state, action) => {
       state.isLoading = false;
-      state.isAuthenticated = true;
       state.appErr = undefined;
       state.serverErr = undefined;
-      state.user = action.payload;
+      state.user = action.payload.data;
+      state.isAuthenticated = action.payload.token;
     });
     builder.addCase(loginAuthAction.rejected, (state, action) => {
+      state.isLoading = false;
+      state.appErr = action?.payload?.message;
+      state.serverErr = action?.error?.message;
+    });
+    // Logout
+    builder.addCase(logoutAuthAction.pending, (state, action) => {
+      state.isLoading = true;
+      state.appErr = undefined;
+      state.serverErr = undefined;
+    });
+    builder.addCase(logoutAuthAction.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.appErr = undefined;
+      state.serverErr = undefined;
+      state.isAuthenticated = false;
+      state.user = null;
+    });
+    builder.addCase(logoutAuthAction.rejected, (state, action) => {
       state.isLoading = false;
       state.appErr = action?.payload?.message;
       state.serverErr = action?.error?.message;

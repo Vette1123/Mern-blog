@@ -67,15 +67,6 @@ const Auth = () => {
 
     return errors;
   };
-  if (isAuthenticated) {
-    if (isRegister) {
-      toast.success("Registration successful");
-      navigate("/");
-    } else {
-      toast.success("Login successful");
-      navigate("/");
-    }
-  }
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -88,6 +79,9 @@ const Auth = () => {
     onSubmit: (values) => {
       if (isRegister) {
         dispatch(registerAuthAction(values));
+        toast.success("Registration successful");
+        navigate("/");
+
         if (appErr) {
           toast.error(appErr);
         }
@@ -95,6 +89,8 @@ const Auth = () => {
         formik.resetForm();
       } else {
         dispatch(loginAuthAction(values));
+        toast.success("Login successful");
+        navigate("/");
         if (appErr) {
           toast.error(appErr);
         }
