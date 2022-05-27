@@ -9,6 +9,7 @@ dbConnect();
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+// app.use(fileUpload());
 // using cors to allow cross origin resource sharing
 // to allow requests from other origins
 app.use(cors());

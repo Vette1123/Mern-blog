@@ -317,12 +317,13 @@ const profilePictureUpload = asyncHandler(async (req, res, next) => {
   const { id } = req.user;
   // console.log(user);
   const file = req.file;
+  console.log(file);
+  console.log(req);
   const result = await uploadFile(file);
-  console.log(result);
   const user = await User.findByIdAndUpdate(
     id,
     {
-      profilePhoto: result?.Key,
+      profilePhoto: result?.Location,
     },
     { new: true }
   );

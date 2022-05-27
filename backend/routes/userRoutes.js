@@ -27,7 +27,7 @@ router
   .post("/login", login)
   .post("/send-email", authMiddleware, generateverificationToken)
   .post(
-    "/profile-picture",
+    "/upload-picture",
     authMiddleware,
     profilePictureUploadMulter,
     profilePictureUpload
