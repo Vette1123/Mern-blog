@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -79,29 +79,38 @@ const Auth = () => {
     onSubmit: (values) => {
       if (isRegister) {
         dispatch(registerAuthAction(values));
-        toast.success("Registration successful");
-        navigate("/");
-
-        if (appErr) {
-          toast.error(appErr);
+        if (isAuthenticated) {
+          toast.success("Registration successful");
         }
         dispatch(reset());
         formik.resetForm();
       } else {
         dispatch(loginAuthAction(values));
-        toast.success("Login successful");
-        navigate("/");
-        if (appErr) {
-          toast.error(appErr);
+        if (isAuthenticated) {
+          toast.success("Login successful");
         }
         dispatch(reset());
         formik.resetForm();
       }
     },
   });
-  if (isLoading) {
-    return <Spinner />;
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (serverErr || appErr) {
+      toast.error(appErr);
+    }
+  }, [serverErr, appErr]);
+
+  useEffect(() => {
+    if (isLoading) {
+      return <Spinner />;
+    }
+  }, [isLoading]);
 
   return (
     <section className="relative min-h-screen py-20 2xl:py-40 bg-gray-800 overflow-hidden">

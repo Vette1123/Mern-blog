@@ -15,8 +15,8 @@ router
 
 router.post("/create", authMiddleware, createCategory);
 
-router.put("/:id", authMiddleware, updateCategory);
+router.put("/update/:id", authMiddleware, updateCategory);
 
-router.delete("/:id", authMiddleware, deleteCategory);
+router.delete("/delete/:id", authMiddleware, deleteCategory);
 
 module.exports = router;

@@ -1,27 +1,34 @@
-import { Link } from "react-router-dom";
-import { PencilAltIcon } from "@heroicons/react/outline";
-import { getAllCategoriesAction } from "../../redux/slices/categorySlice";
+import { Link, useNavigate } from "react-router-dom";
+import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
+import {
+  getAllCategoriesAction,
+  deleteCategoryAction,
+} from "../../redux/slices/categorySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import Spinner from "../spinner/Spinner";
 import ErrorPage from "../../pages/ErrorPage";
 import { toast } from "react-toastify";
+import DateFormater from "../../utils/DateFormater";
 
 const CategoryList = () => {
   const dispatch = useDispatch();
-  const { categoryList, isLoading, appErr, serverErr } = useSelector(
+  const navigate = useNavigate();
+  const { categoryList, isLoading, appErr, serverErr, isEdited } = useSelector(
     (state) => state.category
   );
-  console.log(categoryList);
   useEffect(() => {
     dispatch(getAllCategoriesAction());
-  }, [dispatch]);
+  }, [dispatch, isEdited]);
+
+  useEffect(() => {
+    if (appErr || serverErr) {
+      toast.error("Something went wrong");
+    }
+  }, [appErr, serverErr]);
 
   if (categoryList?.data <= 0) {
     return <ErrorPage />;
-  }
-  if (appErr || serverErr) {
-    toast.error(appErr - serverErr);
   }
   if (isLoading) {
     return <Spinner />;
@@ -58,7 +65,7 @@ const CategoryList = () => {
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
-                      Edit
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -90,13 +97,25 @@ const CategoryList = () => {
                         {category.title}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {/* {<DateFormatter date={category?.createdAt} />} */}
+                        {<DateFormater date={category?.createdAt} />}
                       </td>
-                      <Link to={`/update-category/${category?._id}`}>
+                      <Link to={`/category/update/${category?._id}`}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <PencilAltIcon className="h-5 text-indigo-500" />
                         </td>
                       </Link>
+                      {/* delete a category */}
+                      <button
+                        // dete a category then navigate to category list
+
+                        onClick={() => {
+                          dispatch(deleteCategoryAction(category?._id));
+                          navigate("/category");
+                        }}
+                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                      >
+                        <TrashIcon className="h-5 text-indigo-500" />
+                      </button>
                     </tr>
                   ))}
                 </tbody>
