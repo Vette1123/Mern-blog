@@ -6,30 +6,36 @@ import Navbar from "./components/navigation/Navbar";
 import HomePage from "./pages/HomePage";
 import Auth from "./components/Auth/Auth";
 import ErrorPage from "./pages/ErrorPage";
+// category
 import CategoryCreate from "./components/category/CategoryCreate";
 import CategoryList from "./components/category/CategoryList";
 import CategoryUpdate from "./components/category/CategoryUpdate";
-import { useSelector } from "react-redux";
+// post
+import PostCreate from "./components/post/PostCreate";
 
 const App = () => {
-  const { isAuthenticated } = useSelector((state) => state.auth);
   return (
     <>
       <BrowserRouter>
         <Navbar />
         <Routes>
+          <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<PrivateRoute />}>
             <Route path="/" element={<HomePage />} />
           </Route>
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/category" element={<PrivateRoute />}>
+          {/* category routes */}
+          <Route path="/category" element={<PrivateAdminRoute />}>
             <Route path="/category" element={<CategoryList />} />
           </Route>
-          <Route path="/category/create" element={<PrivateRoute />}>
+          <Route path="/category/create" element={<PrivateAdminRoute />}>
             <Route path="/category/create" element={<CategoryCreate />} />
           </Route>
           <Route path="/category/update/:id" element={<PrivateAdminRoute />}>
             <Route path="/category/update/:id" element={<CategoryUpdate />} />
+          </Route>
+          {/* posts routes */}
+          <Route path="/post" element={<PrivateRoute />}>
+            <Route path="/post" element={<PostCreate />} />
           </Route>
           <Route path="*" element={<ErrorPage />} />
         </Routes>

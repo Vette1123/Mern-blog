@@ -3,6 +3,9 @@ const Post = require("../models/postModel");
 const User = require("../models/userModel");
 const { uploadFile, getFileStream } = require("../utils/s3");
 const Filter = require("bad-words");
+const fs = require("fs");
+const util = require("util");
+const unlinkFile = util.promisify(fs.unlink);
 
 // create a post
 const createPost = asyncHandler(async (req, res, next) => {
@@ -21,23 +24,15 @@ const createPost = asyncHandler(async (req, res, next) => {
     return next(new Error(`Profanity is not allowed`, 400));
   }
   const file = req.file;
+  console.log(req);
   const result = await uploadFile(file);
   const post = await Post.create({
     ...req.body,
     user: req.user.id,
-    image: result.Key,
+    image: result.Location,
   });
   await unlinkFile(file.path);
 
-  await User.findByIdAndUpdate(
-    _id,
-    {
-      $inc: { postCount: 1 },
-    },
-    {
-      new: true,
-    }
-  );
   res.status(201).json({
     success: true,
     data: post,
