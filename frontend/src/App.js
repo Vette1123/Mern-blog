@@ -15,6 +15,8 @@ import PostCreate from "./components/post/PostCreate";
 import PostsList from "./components/post/PostList";
 import PostDetails from "./components/post/PostDetails";
 import PostUpdate from "./components/post/PostUpdate";
+// comment
+import CommentUpdate from "./components/comment/CommentUpdate";
 
 const App = () => {
   return (
@@ -42,6 +44,9 @@ const App = () => {
           </Route>
           <Route path="/post/create" element={<PrivateRoute />}>
             <Route path="/post/create" element={<PostCreate />} />
+          </Route>
+          <Route path="/comment/:id" element={<PrivateRoute />}>
+            <Route path="/comment/:id" element={<CommentUpdate />} />
           </Route>
           <Route path="/post/:id" element={<PostDetails />} />
           <Route path="/post/update/:id" element={<PostUpdate />} />

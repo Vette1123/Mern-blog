@@ -20,12 +20,14 @@ const PostDetails = () => {
   const { singlePost, isLoading, appErr, serverErr } = useSelector(
     (state) => state.post
   );
+
+  const { isUpdated, ra5ara } = useSelector((state) => state.comment);
   const { user } = useSelector((state) => state.auth);
   const isCreatedBy = user._id === singlePost?.data._id;
 
   useEffect(() => {
     dispatch(getPostByIdAction(id));
-  }, [dispatch]);
+  }, [dispatch, isUpdated, ra5ara]);
   useEffect(() => {
     if (appErr || serverErr) {
       toast.error(appErr - serverErr);
@@ -59,7 +61,7 @@ const PostDetails = () => {
               <div class="text-left">
                 <h4 class="mb-1 text-2xl font-bold text-gray-50">
                   <span class="text-xl lg:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-yellow-200 to-orange-600">
-                    {singlePost?.data.user?.firstName}{" "}
+                    {singlePost?.data.user?.firstName}
                     {singlePost?.data.user?.lastName}
                   </span>
                 </h4>
@@ -73,26 +75,23 @@ const PostDetails = () => {
               <p class="mb-6 text-left  text-xl text-gray-200">
                 {singlePost?.data.description}
                 {/* Show delete and update btn if created user */}
-                {isCreatedBy && (
-                  <p class="flex">
-                    <Link
-                      class="p-3"
-                      to={`/post/update/${singlePost?.data.id}`}
-                    >
-                      <PencilAltIcon class="h-8 mt-3 text-yellow-300" />
-                    </Link>
+                {/* {isCreatedBy && ( */}
+                <p class="flex">
+                  <Link class="p-3" to={`/post/update/${singlePost?.data.id}`}>
+                    <PencilAltIcon class="h-8 mt-3 text-yellow-300" />
+                  </Link>
 
-                    <button
-                      onClick={() => {
-                        dispatch(deletePostAction(singlePost?.data._id));
-                        navigate("/post");
-                      }}
-                      class="ml-3"
-                    >
-                      <TrashIcon class="h-8 mt-3 text-red-600" />
-                    </button>
-                  </p>
-                )}
+                  <button
+                    onClick={() => {
+                      dispatch(deletePostAction(singlePost?.data._id));
+                      navigate("/post");
+                    }}
+                    class="ml-3"
+                  >
+                    <TrashIcon class="h-8 mt-3 text-red-600" />
+                  </button>
+                </p>
+                {/* )} */}
               </p>
             </div>
           </div>
@@ -101,7 +100,6 @@ const PostDetails = () => {
         <CommentCreate postId={id} />
         <div className="flex justify-center  items-center">
           {/* <CommentsList comments={post?.comments} postId={post?._id} /> */}
-
           <CommentsList comments={singlePost?.data.comments} />
         </div>
       </section>

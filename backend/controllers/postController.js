@@ -43,12 +43,14 @@ const createPost = asyncHandler(async (req, res, next) => {
 const getPosts = asyncHandler(async (req, res, next) => {
   const hasCategory = req.query.category;
   if (hasCategory) {
-    const posts = await Post.find({ category: hasCategory }).populate({
-      path: "comments",
-      populate: {
-        path: "user",
-      },
-    });
+    const posts = await Post.find({ category: hasCategory })
+      .populate({
+        path: "comments",
+        populate: {
+          path: "user",
+        },
+      })
+      .populate("user");
 
     res.status(200).json({
       success: true,
@@ -63,7 +65,8 @@ const getPosts = asyncHandler(async (req, res, next) => {
         populate: {
           path: "user",
         },
-      });
+      })
+      .populate("user");
 
     res.status(200).json({
       success: true,
@@ -75,12 +78,14 @@ const getPosts = asyncHandler(async (req, res, next) => {
 
 // get a post
 const getPost = asyncHandler(async (req, res, next) => {
-  const post = await Post.findById(req.params.id).populate({
-    path: "comments",
-    populate: {
-      path: "user",
-    },
-  });
+  const post = await Post.findById(req.params.id)
+    .populate({
+      path: "comments",
+      populate: {
+        path: "user",
+      },
+    })
+    .populate("user");
 
   if (!post) {
     return next(new Error(`Post not found with id of ${req.params.id}`, 404));
