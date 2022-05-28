@@ -7,8 +7,10 @@ import CategoryDropDown from "../category/CategoryDropDown";
 import { useEffect } from "react";
 import styled from "styled-components";
 import Spinner from "../spinner/Spinner";
+import { useNavigate } from "react-router-dom";
 
 export default function CreatePost() {
+  const navigate = useNavigate();
   const validate = (values) => {
     const errors = {};
     if (!values.title) {
@@ -26,10 +28,10 @@ export default function CreatePost() {
       errors.description = "Must be less than 20 characters";
     }
     if (!values.category.label) {
-      errors.category = "Required";
+      errors.category = "Select a category";
     }
     if (!values.image) {
-      errors.image = "Required";
+      errors.image = "Image is required";
     } else if (values.image.length > 2) {
       errors.image = "Must be less than 2";
     }
@@ -57,7 +59,6 @@ transition: border 0.24s ease-in-out;
   const { isLoading, posts, appErr, serverErr, isSuccess } = useSelector(
     (state) => state.post
   );
-
   const formik = useFormik({
     initialValues: {
       title: "",
@@ -67,7 +68,6 @@ transition: border 0.24s ease-in-out;
     },
     validate,
     onSubmit: (values) => {
-      console.log(values);
       const data = {
         title: values.title,
         description: values.description,
@@ -75,9 +75,8 @@ transition: border 0.24s ease-in-out;
         image: values.image,
       };
       dispatch(createPostAction(data));
-      // if (isSuccess) {
+      navigate("/");
       toast.success("Post created successfully");
-      // }
     },
   });
 
@@ -139,6 +138,12 @@ transition: border 0.24s ease-in-out;
                   {formik.touched.title && formik.errors.title}
                 </div>
               </div>
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Category
+              </label>
               <CategoryDropDown
                 value={formik.values.category?.label}
                 onChange={formik.setFieldValue}
@@ -154,7 +159,7 @@ transition: border 0.24s ease-in-out;
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 mb-2"
                 >
                   Description
                 </label>
@@ -177,7 +182,14 @@ transition: border 0.24s ease-in-out;
                 </div>
 
                 {/* image component */}
-                <Container className="container bg-gray-600 mt-5">
+                <label
+                  htmlFor="image"
+                  className="block text-sm font-medium text-gray-700 mt-2"
+                >
+                  Please select an image to upload
+                </label>
+
+                <Container className="container bg-gray-600 mt-2">
                   <Dropzone
                     // accept={["image/jpeg", "image/png"]}
                     maxfiles={2}

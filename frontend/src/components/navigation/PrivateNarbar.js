@@ -14,8 +14,8 @@ import { logoutAuthAction } from "../../redux/slices/authSlice";
 import { useDispatch } from "react-redux";
 const navigation = [
   { name: "Home", href: "/", current: true },
-  { name: "Create", href: "/create-post", current: false },
-  { name: "Posts", href: "/posts", current: false },
+  { name: "Create", href: "/post/create", current: false },
+  { name: "Posts", href: "/post", current: false },
   { name: "Authors", href: "/users", current: false },
 ];
 
@@ -73,7 +73,7 @@ const PrivateNavbar = ({ isLogin }) => {
               <div className="flex items-center">
                 <div className="flex-shrink-0 ">
                   <Link
-                    to="/create-post"
+                    to="/post/create"
                     className="pr-3  relative inline-flex items-center mr-2 px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
                   >
                     <PlusIcon

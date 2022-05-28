@@ -2,6 +2,7 @@ import { PlusCircleIcon, BookOpenIcon } from "@heroicons/react/solid";
 import { useDispatch, useSelector } from "react-redux";
 import { createCategoryAction } from "../../redux/slices/categorySlice";
 import { useFormik } from "formik";
+import { useNavigate } from "react-router-dom";
 import Spinner from "../spinner/Spinner";
 import { toast } from "react-toastify";
 
@@ -19,6 +20,7 @@ const validate = (values) => {
 
 const CategoryCreate = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isLoading, category, appErr, serverErr } = useSelector(
     (state) => state.category
   );
@@ -30,6 +32,7 @@ const CategoryCreate = () => {
     validate,
     onSubmit: (values) => {
       dispatch(createCategoryAction(values));
+      navigate("/category");
       toast.success("Category created successfully");
       if (appErr || serverErr) {
         toast.error(appErr);

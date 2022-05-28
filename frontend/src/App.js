@@ -12,6 +12,7 @@ import CategoryList from "./components/category/CategoryList";
 import CategoryUpdate from "./components/category/CategoryUpdate";
 // post
 import PostCreate from "./components/post/PostCreate";
+import PostsList from "./components/post/PostList";
 
 const App = () => {
   return (
@@ -35,7 +36,10 @@ const App = () => {
           </Route>
           {/* posts routes */}
           <Route path="/post" element={<PrivateRoute />}>
-            <Route path="/post" element={<PostCreate />} />
+            <Route path="/post" element={<PostsList />} />
+          </Route>
+          <Route path="/post/create" element={<PrivateRoute />}>
+            <Route path="/post/create" element={<PostCreate />} />
           </Route>
           <Route path="*" element={<ErrorPage />} />
         </Routes>

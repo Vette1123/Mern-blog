@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import baseURL from "../../utils/baseURL";
 import Cookies from "universal-cookie";
@@ -6,6 +6,8 @@ import Cookies from "universal-cookie";
 const cookies = new Cookies();
 
 // actions
+
+const resetCategory = createAction("category/RESET_CATEGORY");
 
 // create category action
 export const createCategoryAction = createAsyncThunk(
@@ -26,6 +28,7 @@ export const createCategoryAction = createAsyncThunk(
         },
         config
       );
+      thunkAPI.dispatch(resetCategory());
       return response?.data;
     } catch (error) {
       if (!error.response) {
@@ -143,12 +146,19 @@ const categorySlice = createSlice({
       state.isLoading = true;
       state.appErr = undefined;
       state.serverErr = undefined;
+      state.isEdited = false;
     });
+
+    builder.addCase(resetCategory, (state, action) => {
+      state.isEdited = false;
+    });
+
     builder.addCase(createCategoryAction.fulfilled, (state, action) => {
       state.isLoading = false;
       state.category = action?.payload;
       state.appErr = undefined;
       state.serverErr = undefined;
+      state.isEdited = true;
     });
     builder.addCase(createCategoryAction.rejected, (state, action) => {
       state.isLoading = false;

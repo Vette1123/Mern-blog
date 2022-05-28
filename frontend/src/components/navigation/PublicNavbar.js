@@ -10,7 +10,7 @@ import { PlusIcon } from "@heroicons/react/solid";
 
 const navigation = [
   { name: "Home", href: "/", current: true },
-  { name: "Create", href: "/create-post", current: false },
+  { name: "Create", href: "/post/create", current: false },
   { name: "Posts", href: "/posts", current: false },
 ];
 
@@ -75,7 +75,7 @@ const PublicNavbar = () => {
                 </div>
                 <div className="hidden md:ml-4 md:flex-shrink-0 md:flex md:items-center">
                   <Link
-                    to="/create-post"
+                    to="/post/create"
                     className="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pink-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
                   >
                     <PlusIcon

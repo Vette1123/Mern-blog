@@ -16,11 +16,11 @@ import { PlusIcon } from "@heroicons/react/solid";
 
 const navigation = [
   { name: "Home", href: "/", current: true },
-  { name: "Create", href: "/create-post", current: false },
-  { name: "Posts", href: "/posts", current: false },
+  { name: "Create", href: "/post/create", current: false },
+  { name: "Posts", href: "/post", current: false },
   { name: "Authors", href: "/users", current: false },
-  { name: "Add Category", href: "/add-category", current: false },
-  { name: "Category List", href: "/category-list", current: false },
+  { name: "Add Category", href: "/category/create", current: false },
+  { name: "Category List", href: "/category", current: false },
 ];
 
 function classNames(...classes) {
@@ -79,7 +79,7 @@ const AdminNavbar = () => {
                 <div className="flex-shrink-0">
                   {/* New post */}
                   <Link
-                    to="/create-post"
+                    to="/post/create"
                     type="button"
                     className="relative mr-4 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
                   >
