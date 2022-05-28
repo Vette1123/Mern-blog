@@ -23,7 +23,10 @@ const createComment = asyncHandler(async (req, res, next) => {
 });
 // get all comments
 const getComments = asyncHandler(async (req, res, next) => {
-  const comments = await Comment.find().sort("-created");
+  const comments = await Comment.find()
+    .populate("user")
+    .populate("post")
+    .sort("-created");
   res.status(200).json({
     success: true,
     count: comments.length,
@@ -32,7 +35,9 @@ const getComments = asyncHandler(async (req, res, next) => {
 });
 // get a comment
 const getComment = asyncHandler(async (req, res, next) => {
-  const comment = await Comment.findById(req.params.id);
+  const comment = await Comment.findById(req.params.id)
+    .populate("user")
+    .populate("post");
   if (!comment) {
     return next(
       new Error(`Comment not found with id of ${req.params.id}`, 404)

@@ -1,7 +1,11 @@
 import { ThumbUpIcon, ThumbDownIcon, EyeIcon } from "@heroicons/react/solid";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { getAllPostsAction } from "../../redux/slices/postSlice";
+import {
+  getAllPostsAction,
+  toggleLikeAction,
+  toggleDislikeAction,
+} from "../../redux/slices/postSlice";
 import { useEffect } from "react";
 import Spinner from "../spinner/Spinner";
 import { toast } from "react-toastify";
@@ -10,14 +14,22 @@ import { getAllCategoriesAction } from "../../redux/slices/categorySlice";
 
 export default function PostsList() {
   const dispatch = useDispatch();
-  const { postList, isSuccess, isLoading, appErr, serverErr } = useSelector(
-    (state) => state.post
-  );
+  const {
+    postList,
+    isSuccess,
+    isLoading,
+    appErr,
+    serverErr,
+    likes,
+    dislikes,
+    isUpdated,
+    isDeleted,
+  } = useSelector((state) => state.post);
   const { categoryList } = useSelector((state) => state.category);
   // fetch posts
   useEffect(() => {
     dispatch(getAllPostsAction(""));
-  }, [dispatch, isSuccess]);
+  }, [dispatch, isSuccess, likes, dislikes, isUpdated, isDeleted]);
   // fetch categories
 
   useEffect(() => {
@@ -101,7 +113,12 @@ export default function PostsList() {
                         <div className="flex flex-row justify-center items-center ml-4 mr-4 pb-2 pt-1">
                           {/* Togle like  */}
                           <div className="">
-                            <ThumbUpIcon className="h-7 w-7 text-indigo-600 cursor-pointer" />
+                            <ThumbUpIcon
+                              onClick={() => {
+                                dispatch(toggleLikeAction(post._id));
+                              }}
+                              className="h-7 w-7 text-indigo-600 cursor-pointer"
+                            />
                           </div>
                           <div className="pl-2 text-gray-600">
                             {post?.likes.length}
@@ -110,7 +127,12 @@ export default function PostsList() {
                         {/* Dislike */}
                         <div className="flex flex-row  justify-center items-center ml-4 mr-4 pb-2 pt-1">
                           <div>
-                            <ThumbDownIcon className="h-7 w-7 cursor-pointer text-gray-600" />
+                            <ThumbDownIcon
+                              onClick={() => {
+                                dispatch(toggleDislikeAction(post._id));
+                              }}
+                              className="h-7 w-7 cursor-pointer text-gray-600"
+                            />
                           </div>
                           <div className="pl-2 text-gray-600">
                             {post?.disLikes.length ? post?.disLikes.length : 0}
@@ -137,7 +159,7 @@ export default function PostsList() {
                       <p class="text-gray-300">{post?.description}</p>
                       {/* Read more */}
                       <Link
-                        to="/post"
+                        to={`/post/${post?._id}`}
                         className="text-indigo-500 hover:underline"
                       >
                         Read More..

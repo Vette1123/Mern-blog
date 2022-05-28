@@ -5,13 +5,13 @@ import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
 
-const token = cookies.get("token");
+const token = cookies.get("token") ? cookies.get("token") : null;
 const user = localStorage.getItem("userInfo")
   ? JSON.parse(localStorage.getItem("userInfo"))
   : null;
 
 const initialState = {
-  isAuthenticated: !!token,
+  isAuthenticated: token,
   user: user,
   isLoading: false,
   isRegister: false,
@@ -25,7 +25,10 @@ export const registerAuthAction = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
       const response = await axios.post(`${baseURL}users/register`, data);
-      cookies.set("token", response?.data.token, { path: "/" });
+      cookies.set("token", response.data.token, {
+        path: "/",
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+      });
       localStorage.setItem("userInfo", JSON.stringify(response?.data.data));
       return response?.data;
     } catch (error) {
@@ -43,7 +46,10 @@ export const loginAuthAction = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
       const response = await axios.post(`${baseURL}users/login`, data);
-      cookies.set("token", response?.data.token, { path: "/" });
+      cookies.set("token", response.data.token, {
+        path: "/",
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+      });
       localStorage.setItem("userInfo", JSON.stringify(response?.data.data));
       return response?.data;
     } catch (error) {

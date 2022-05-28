@@ -82,14 +82,14 @@ const Auth = () => {
         if (isAuthenticated) {
           toast.success("Registration successful");
         }
-        dispatch(reset());
+        // dispatch(reset());
         formik.resetForm();
       } else {
         dispatch(loginAuthAction(values));
         if (isAuthenticated) {
           toast.success("Login successful");
         }
-        dispatch(reset());
+        // dispatch(reset());
         formik.resetForm();
       }
     },
@@ -106,11 +106,9 @@ const Auth = () => {
     }
   }, [serverErr, appErr]);
 
-  useEffect(() => {
-    if (isLoading) {
-      return <Spinner />;
-    }
-  }, [isLoading]);
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <section className="relative min-h-screen py-20 2xl:py-40 bg-gray-800 overflow-hidden">
