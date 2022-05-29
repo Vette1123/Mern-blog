@@ -41,38 +41,16 @@ const createPost = asyncHandler(async (req, res, next) => {
 
 // get all posts
 const getPosts = asyncHandler(async (req, res, next) => {
+  // get pagination query params
+
   const hasCategory = req.query.category;
   if (hasCategory) {
-    const posts = await Post.find({ category: hasCategory })
-      .populate({
-        path: "comments",
-        populate: {
-          path: "user",
-        },
-      })
-      .populate("user");
-
-    res.status(200).json({
-      success: true,
-      count: posts.length,
-      data: posts,
-    });
+    res.paginatedResults.results = res.paginatedResults.results.filter(
+      (post) => post.category === hasCategory
+    );
+    res.json(res.paginatedResults);
   } else {
-    const posts = await Post.find()
-      .populate("user")
-      .populate({
-        path: "comments",
-        populate: {
-          path: "user",
-        },
-      })
-      .populate("user");
-
-    res.status(200).json({
-      success: true,
-      count: posts.length,
-      data: posts,
-    });
+    res.json(res.paginatedResults);
   }
 });
 

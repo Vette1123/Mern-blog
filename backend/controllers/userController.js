@@ -351,6 +351,8 @@ const downloadProfilePicture = asyncHandler(async (req, res, next) => {
   readStream.pipe(res);
 });
 
+// paginate users
+
 module.exports = {
   register,
   login,

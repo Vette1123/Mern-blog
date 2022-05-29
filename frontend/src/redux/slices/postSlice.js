@@ -41,11 +41,14 @@ export const getAllPostsAction = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
       const token = new Cookies().get("token");
-      const response = await axios.get(`${baseURL}posts?category=${data}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${baseURL}posts?category=${data.category}&page=${data.page}&limit=${data.limit}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       if (!error.response) {
@@ -182,6 +185,9 @@ const postSlice = createSlice({
   reducers: {
     reset: (state) => {
       state.posts = {};
+    },
+    setPageNumber: (state, action) => {
+      state.pageNumber = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -329,5 +335,5 @@ const postSlice = createSlice({
   },
 });
 
-export const { reset } = postSlice.actions;
+export const { reset, setPageNumber } = postSlice.actions;
 export default postSlice.reducer;

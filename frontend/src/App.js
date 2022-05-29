@@ -19,6 +19,7 @@ import PostUpdate from "./components/post/PostUpdate";
 import CommentUpdate from "./components/comment/CommentUpdate";
 // user profile
 import Profile from "./components/profile/Profile";
+// pagination
 
 const App = () => {
   return (

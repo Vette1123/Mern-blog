@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import DateFormater from "../../utils/DateFormater";
 import { getAllCategoriesAction } from "../../redux/slices/categorySlice";
 import NoItems from "../noitemsfound/NoItems";
+import PaginationOutlined from "../paginate/Pagination";
 
 export default function PostsList() {
   const dispatch = useDispatch();
@@ -30,7 +31,7 @@ export default function PostsList() {
   const { categoryList, isEdited } = useSelector((state) => state.category);
   // fetch posts
   useEffect(() => {
-    dispatch(getAllPostsAction(""));
+    dispatch(getAllPostsAction({ category: "" }));
   }, [likes, dislikes, isUpdated, isDeleted, isCreated]);
   // fetch categories
 
@@ -64,7 +65,7 @@ export default function PostsList() {
                 <button
                   class="inline-block py-2 px-6 rounded-l-xl rounded-t-xl bg-green-600 hover:bg-green-700 text-gray-50 font-bold leading-loose transition duration-200"
                   onClick={() => {
-                    dispatch(getAllPostsAction(""));
+                    dispatch(getAllPostsAction({ category: "" }));
                   }}
                 >
                   View All Posts
@@ -83,7 +84,9 @@ export default function PostsList() {
                         <p
                           className="block cursor-pointer py-2 px-3 mb-4 rounded text-yellow-500 font-bold bg-gray-500"
                           onClick={() => {
-                            dispatch(getAllPostsAction(category.title));
+                            dispatch(
+                              getAllPostsAction({ category: category.title })
+                            );
                           }}
                         >
                           {category?.title}
@@ -95,10 +98,10 @@ export default function PostsList() {
               </div>
               <div class="w-full lg:w-3/4 px-3">
                 {/* post goes here */}
-                {postList?.data?.length === 0 ? (
+                {postList?.results?.length === 0 ? (
                   <NoItems />
                 ) : (
-                  postList?.data.map((post) => (
+                  postList?.results.map((post) => (
                     <div
                       key={post?._id}
                       class="flex flex-wrap bg-gray-900 -mx-3  lg:mb-6"
@@ -208,6 +211,11 @@ export default function PostsList() {
                   ))
                 )}
               </div>
+              <PaginationOutlined
+                count={postList?.total}
+                page={postList?.page}
+                limit={postList?.limit}
+              />
             </div>
           </div>
         </div>

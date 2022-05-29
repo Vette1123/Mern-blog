@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 const { profilePictureUploadMulter } = require("../middlewares/uploadPhotos");
+const { paginatedResults } = require("../middlewares/pagination");
+const Post = require("../models/postModel");
 const {
   createPost,
   getPosts,
@@ -12,7 +14,9 @@ const {
   togglePostDisLike,
 } = require("../controllers/postController");
 
-router.get("/", authMiddleware, getPosts).get("/:id", getPost);
+router
+  .get("/", authMiddleware, paginatedResults(Post), getPosts)
+  .get("/:id", getPost);
 
 router.post("/create", authMiddleware, profilePictureUploadMulter, createPost);
 
