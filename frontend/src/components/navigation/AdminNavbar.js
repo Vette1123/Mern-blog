@@ -2,7 +2,7 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { logoutAuthAction } from "../../redux/slices/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Link } from "react-router-dom";
 import {
@@ -29,9 +29,11 @@ function classNames(...classes) {
 
 const AdminNavbar = () => {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+
   //Navigation
   const userNavigation = [
-    { name: "Your Profile", href: `/profile` },
+    { name: "Your Profile", href: `/profile/${user?._id}` },
     { name: "Change your password", href: "/update-password" },
   ];
 
@@ -112,7 +114,7 @@ const AdminNavbar = () => {
                             <span className="sr-only">Open user menu</span>
                             <img
                               className="h-8 w-8 rounded-full"
-                              // src={userAuth?.profilePhoto}
+                              src={user?.profilePhoto}
                               alt="Admin Profile"
                             />
                           </Menu.Button>

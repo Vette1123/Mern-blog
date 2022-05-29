@@ -79,6 +79,7 @@ export const updateCategoryAction = createAsyncThunk(
         },
         config
       );
+      thunkAPI.dispatch(resetCategory());
       return response?.data;
     } catch (error) {
       if (!error.response) {
@@ -104,6 +105,7 @@ export const deleteCategoryAction = createAsyncThunk(
         `${baseURL}categories/delete/${id}`,
         config
       );
+      thunkAPI.dispatch(resetCategory());
       return response?.data;
     } catch (error) {
       if (!error.response) {

@@ -12,7 +12,7 @@ const {
   togglePostDisLike,
 } = require("../controllers/postController");
 
-router.get("/", authMiddleware, getPosts).get("/:id", authMiddleware, getPost);
+router.get("/", authMiddleware, getPosts).get("/:id", getPost);
 
 router.post("/create", authMiddleware, profilePictureUploadMulter, createPost);
 

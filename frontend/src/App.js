@@ -17,6 +17,8 @@ import PostDetails from "./components/post/PostDetails";
 import PostUpdate from "./components/post/PostUpdate";
 // comment
 import CommentUpdate from "./components/comment/CommentUpdate";
+// user profile
+import Profile from "./components/profile/Profile";
 
 const App = () => {
   return (
@@ -39,17 +41,22 @@ const App = () => {
             <Route path="/category/update/:id" element={<CategoryUpdate />} />
           </Route>
           {/* posts routes */}
-          <Route path="/post" element={<PrivateRoute />}>
-            <Route path="/post" element={<PostsList />} />
-          </Route>
+          {/* <Route path="/post" element={<PrivateRoute />}> */}
+          <Route path="/post" element={<PostsList />} />
+          {/* </Route> */}
           <Route path="/post/create" element={<PrivateRoute />}>
             <Route path="/post/create" element={<PostCreate />} />
           </Route>
           <Route path="/comment/:id" element={<PrivateRoute />}>
             <Route path="/comment/:id" element={<CommentUpdate />} />
           </Route>
+          {/* public post routes */}
           <Route path="/post/:id" element={<PostDetails />} />
           <Route path="/post/update/:id" element={<PostUpdate />} />
+          {/* profile routes */}
+          <Route path="/profile/:id" element={<PrivateRoute />}>
+            <Route path="/profile/:id" element={<Profile />} />
+          </Route>
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>

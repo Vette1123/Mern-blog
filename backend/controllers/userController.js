@@ -12,7 +12,9 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // register user controller
 const register = asyncHandler(async (req, res, next) => {
-  const userExists = await User.findOne({ email: req.body.email });
+  const userExists = await User.findOne({ email: req.body.email }).populate(
+    "posts"
+  );
   if (userExists) {
     return next(
       new Error(`User with email ${req.body.email} already exists`, 400)
@@ -24,7 +26,7 @@ const register = asyncHandler(async (req, res, next) => {
     lastName,
     email,
     password,
-  });
+  }).populate("posts");
   const token = user.generateToken();
   res.status(201).json({
     success: true,
@@ -35,7 +37,7 @@ const register = asyncHandler(async (req, res, next) => {
 
 const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).populate("posts");
   if (!user) {
     return next(new Error("User not found", 400));
   }

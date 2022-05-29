@@ -11,7 +11,7 @@ import {
 } from "@heroicons/react/outline";
 import { PlusIcon, LogoutIcon } from "@heroicons/react/solid";
 import { logoutAuthAction } from "../../redux/slices/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 const navigation = [
   { name: "Home", href: "/", current: true },
   { name: "Create", href: "/post/create", current: false },
@@ -30,6 +30,7 @@ const PrivateNavbar = ({ isLogin }) => {
     { name: "Change your password", href: "/update-password" },
   ];
 
+  const { user } = useSelector((state) => state.auth);
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -105,7 +106,7 @@ const PrivateNavbar = ({ isLogin }) => {
                             <span className="sr-only">Open user menu</span>
                             <img
                               className="h-8 w-8 rounded-full"
-                              // src={isLogin?.profilePhoto}
+                              src={user?.profilePhoto}
                               alt=""
                             />
                           </Menu.Button>

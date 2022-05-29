@@ -42,7 +42,8 @@ export default function CommentsList({ comments }) {
                     <p className="text-bold text-yellow-500 text-base ml-5">
                       <Moment fromNow ago>
                         {comment?.createdAt}
-                      </Moment>
+                      </Moment>{" "}
+                      ago
                     </p>
                   </div>
                   <p className="text-sm text-gray-400">

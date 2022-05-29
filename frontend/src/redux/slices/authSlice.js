@@ -78,6 +78,25 @@ export const logoutAuthAction = createAsyncThunk(
     }
   }
 );
+// get user info
+export const getUserInfoAction = createAsyncThunk(
+  "auth/getUserInfo",
+  async (data, thunkAPI) => {
+    try {
+      const response = await axios.get(`${baseURL}users/${data}`, {
+        headers: {
+          Authorization: `Bearer ${cookies.get("token")}`,
+        },
+      });
+      return response?.data;
+    } catch (error) {
+      if (!error.response) {
+        throw error;
+      }
+      return thunkAPI.rejectWithValue(error?.response.data);
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -146,6 +165,23 @@ const authSlice = createSlice({
       state.user = null;
     });
     builder.addCase(logoutAuthAction.rejected, (state, action) => {
+      state.isLoading = false;
+      state.appErr = action?.payload?.message;
+      state.serverErr = action?.error?.message;
+    });
+    // Get user info
+    builder.addCase(getUserInfoAction.pending, (state, action) => {
+      state.isLoading = true;
+      state.appErr = undefined;
+      state.serverErr = undefined;
+    });
+    builder.addCase(getUserInfoAction.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.appErr = undefined;
+      state.serverErr = undefined;
+      state.userDetails = action.payload.data;
+    });
+    builder.addCase(getUserInfoAction.rejected, (state, action) => {
       state.isLoading = false;
       state.appErr = action?.payload?.message;
       state.serverErr = action?.error?.message;

@@ -3,7 +3,7 @@ import axios from "axios";
 import baseURL from "../../utils/baseURL";
 import Cookies from "universal-cookie";
 
-const resetPost = createAction("post/reset");
+const resetPost = createAction("post/resetPost");
 const resetPostEdit = createAction("post/resetUpdate");
 const resetPostDelete = createAction("post/resetDelete");
 
@@ -18,14 +18,13 @@ export const createPostAction = createAsyncThunk(
       formData.append("description", data?.description);
       formData.append("category", data?.category);
       formData.append("image", data?.image[0]);
-
       const response = await axios.post(`${baseURL}posts/create`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
-      thunkAPI.dispatch(resetPostEdit());
+      // thunkAPI.dispatch(resetPost());
       return response.data;
     } catch (error) {
       if (!error.response) {
@@ -139,7 +138,7 @@ export const updatePostAction = createAsyncThunk(
           },
         }
       );
-      thunkAPI.dispatch(resetPost());
+      // thunkAPI.dispatch(resetPostEdit());
       return response.data;
     } catch (error) {
       if (!error.response) {
@@ -160,7 +159,7 @@ export const deletePostAction = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      thunkAPI.dispatch(resetPostDelete());
+      // thunkAPI.dispatch(resetPostDelete());
       return response.data;
     } catch (error) {
       if (!error.response) {
@@ -174,7 +173,12 @@ export const deletePostAction = createAsyncThunk(
 // post slice
 const postSlice = createSlice({
   name: "post",
-  initialState: { posts: {} },
+  initialState: {
+    posts: {},
+    isCreated: false,
+    isUpdated: false,
+    isDeleted: false,
+  },
   reducers: {
     reset: (state) => {
       state.posts = {};
@@ -188,12 +192,12 @@ const postSlice = createSlice({
       state.serverErr = undefined;
     });
     builder.addCase(resetPost, (state, action) => {
-      state.isSuccess = false;
+      state.isCreated = false;
     });
     builder.addCase(createPostAction.fulfilled, (state, action) => {
       state.isLoading = false;
       state.posts = action.payload;
-      state.isSuccess = true;
+      state.isCreated = true;
       state.appErr = undefined;
       state.serverErr = undefined;
     });

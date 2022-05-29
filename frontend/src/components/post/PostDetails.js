@@ -22,8 +22,8 @@ const PostDetails = () => {
   );
 
   const { isUpdated, ra5ara } = useSelector((state) => state.comment);
-  const { user } = useSelector((state) => state.auth);
-  const isCreatedBy = user._id === singlePost?.data._id;
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const isCreatedBy = user?._id === singlePost?.data?.user?._id;
 
   useEffect(() => {
     dispatch(getPostByIdAction(id));
@@ -75,29 +75,32 @@ const PostDetails = () => {
               <p class="mb-6 text-left  text-xl text-gray-200">
                 {singlePost?.data.description}
                 {/* Show delete and update btn if created user */}
-                {/* {isCreatedBy && ( */}
-                <p class="flex">
-                  <Link class="p-3" to={`/post/update/${singlePost?.data.id}`}>
-                    <PencilAltIcon class="h-8 mt-3 text-yellow-300" />
-                  </Link>
+                {isCreatedBy && (
+                  <p class="flex">
+                    <Link
+                      class="p-3"
+                      to={`/post/update/${singlePost?.data.id}`}
+                    >
+                      <PencilAltIcon class="h-8 mt-3 text-yellow-300" />
+                    </Link>
 
-                  <button
-                    onClick={() => {
-                      dispatch(deletePostAction(singlePost?.data._id));
-                      navigate("/post");
-                    }}
-                    class="ml-3"
-                  >
-                    <TrashIcon class="h-8 mt-3 text-red-600" />
-                  </button>
-                </p>
-                {/* )} */}
+                    <button
+                      onClick={() => {
+                        dispatch(deletePostAction(singlePost?.data._id));
+                        navigate("/post");
+                      }}
+                      class="ml-3"
+                    >
+                      <TrashIcon class="h-8 mt-3 text-red-600" />
+                    </button>
+                  </p>
+                )}
               </p>
             </div>
           </div>
         </div>
         {/* Add comment Form component here */}
-        <CommentCreate postId={id} />
+        {isAuthenticated && <CommentCreate postId={id} />}
         <div className="flex justify-center  items-center">
           {/* <CommentsList comments={post?.comments} postId={post?._id} /> */}
           <CommentsList comments={singlePost?.data.comments} />

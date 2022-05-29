@@ -56,9 +56,7 @@ transition: border 0.24s ease-in-out;
 `;
 
   const dispatch = useDispatch();
-  const { isLoading, posts, appErr, serverErr, isSuccess } = useSelector(
-    (state) => state.post
-  );
+  const { isLoading, appErr, serverErr } = useSelector((state) => state.post);
   const formik = useFormik({
     initialValues: {
       title: "",
@@ -75,7 +73,7 @@ transition: border 0.24s ease-in-out;
         image: values.image,
       };
       dispatch(createPostAction(data));
-      navigate("/");
+      navigate("/post");
       toast.success("Post created successfully");
     },
   });
