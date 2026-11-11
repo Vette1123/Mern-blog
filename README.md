@@ -5,7 +5,7 @@
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-1.8-764ABC?logo=redux&logoColor=white)
 ![Tailwind](https://img.shields.io/badge/Tailwind-3-38B2AC?logo=tailwind-css&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-18-339933?logo=node.js&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-14%2B-339933?logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?logo=mongodb&logoColor=white)
 
@@ -59,7 +59,7 @@ Mern-blog/
 
 ### Prerequisites
 
-- Node.js 16+
+- Node.js 14+ (the minimum Create React App 5 supports)
 - A MongoDB instance (local or Atlas)
 - AWS S3 bucket + IAM credentials (for image uploads)
 - SendGrid API key (for verification & reset emails)
