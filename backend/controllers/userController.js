@@ -228,7 +228,7 @@ const generateverificationToken = asyncHandler(async (req, res, next) => {
   )}/api/users/verify-email/${token}`;
   const message = `Please verify your email by clicking the link: ${url}. If you did not request this, please ignore this email.`;
   const msg = {
-    to: "boogado@yahoo.com",
+    to: "booogado@gmail.com",
     from: "sadge@post.com",
     subject: "Account Verification",
     text: message,
